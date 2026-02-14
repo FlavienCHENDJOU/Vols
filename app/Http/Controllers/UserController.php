@@ -8,22 +8,23 @@ use App\Models\Reservation;
 use App\Models\Vol;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
    
     public function index(){
         $user = Auth::user();
-        return view('userinfo', compact('user'));
+        return view('infoUtilisateur', compact('user'));
     }
      
     public function updateUserInfo(Request $request)
     {
-        $request->validate([
-            'id' => 'required|integer|exists:users,id',
+         $user = Auth::user();
+         $request->validate([
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
-            'mail' => 'required|string|email|max:255',
+            'mail' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8', 
         ]);
 
@@ -56,4 +57,3 @@ class UserController extends Controller
 
        
 }
-   

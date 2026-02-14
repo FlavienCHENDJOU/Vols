@@ -1,12 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
 use App\Models\Vol;          
 use DB;
 
-class volController extends Controller
+class VolController extends Controller
 {
     // Méthode pour afficher la page d'accueil avec le formulaire de recherche
     public function accueil()

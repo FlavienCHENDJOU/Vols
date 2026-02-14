@@ -2,128 +2,252 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Réservation de Vol - Premium</title>
+    <title>Finaliser ma Réservation | AeroFlight</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="css/style.css" />
+    
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #eef1f5;
+            font-family: 'Poppins', sans-serif; 
+            background-image: url("{{ asset('/img/01.jpg') }}");         
+            color: #333;
             margin: 0;
-            padding: 0;
+            padding: 20px;
+
         }
 
         .container {
-            width: 90%;
             max-width: 800px;
-            margin: 50px auto;
+            margin: 40px auto;
             background: #fff;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            overflow: hidden;
         }
-
-        h2 {
+        .flight-summary {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            padding: 30px;
             text-align: center;
-            color: #007bff;
         }
 
-        label {
-            display: block;
-            margin-top: 20px;
-            font-weight: bold;
+        .flight-summary h2 { margin: 0 0 10px 0; font-weight: 600; }
+        .route-info { font-size: 1.2rem; display: flex; justify-content: center; align-items: center; gap: 20px; }
+        .route-info i { color: #ff5733; }
+
+        .booking-form { padding: 40px; }
+        
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 20px;
+            border-left: 4px solid #ff5733;
+            padding-left: 15px;
         }
+
+        .form-group { margin-bottom: 20px; }
+        
+        label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem; color: #64748b; }
 
         input, select, textarea {
             width: 100%;
-            padding: 10px;
-            margin-top: 5px border-radius: 5px;
-            border: 1px solid #ccc;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            font-family: inherit;
+            box-sizing: border-box; 
+            transition: 0.3s;
         }
 
-        .radio-group, .payment-methods {
-            display: flex;
-            flex-wrap: wrap;
-            margin-top: 10px;
+        input:focus { outline: none; border-color: #ff5733; box-shadow: 0 0 0 3px rgba(255, 87, 51, 0.1); }
+
+      
+        .custom-radio-group { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 10px; }
+        
+        .custom-radio-group label {
+            flex: 1;
+            min-width: 120px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 0;
         }
 
-        .radio-group label, .payment-methods label {
-            margin-right: 20px;
+        .custom-radio-group input { display: none; }
+
+        .custom-radio-group label:hover { border-color: #cbd5e1; }
+
+        .custom-radio-group input:checked + span { color: #ff5733; font-weight: 600; }
+        .custom-radio-group input:checked + label, 
+        .custom-radio-group label.active {
+            border-color: #ff5733;
+            background: rgba(255, 87, 51, 0.05);
         }
 
-        .payment-methods img {
-            width: 50px;
-            height: auto;
-            margin-left: 10px;
-            vertical-align: middle;
+        .payment-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .payment-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
         }
+        .payment-card img { height: 30px; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto; }
+        .payment-card input { display: none; }
+        
+        .payment-card:has(input:checked) { border-color: #ff5733; background: #fffcfb; }
 
-        button {
-            background-color: #007bff;
+        button.btn-submit {
+            background: #ff5733;
             color: white;
             border: none;
-            padding: 15px;
+            padding: 18px;
             width: 100%;
-            margin-top: 30px;
-            border-radius: 5px;
-            font-size: 16px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
             cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(255, 87, 51, 0.2);
+            margin-top: 20px;
         }
 
-        button:hover {
-            background-color: #0056b3;
+        button.btn-submit:hover { background: #e64a19; transform: translateY(-2px); }
+
+        .info-alert {
+            background: #fff9f0;
+            border: 1px solid #ffedda;
+            padding: 15px;
+            border-radius: 10px;
+            color: #b45309;
+            font-size: 0.85rem;
+            margin-bottom: 30px;
         }
+        .alert-danger {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .alert-danger ul { margin: 0; padding-left: 20px; }
     </style>
 </head>
-<body>
+<body id="booking">
 
 <div class="container">
-    <h2>Formulaire de Réservation</h2>
-    <form action="{{ route('form.reserver') }}" method="GET">
-    <input type="hidden" name="vol_id" value="{{ $vol->id }}">
-        @csrf
-        <h3 >
-          Réservation du vol n°{{ $vol->id}}  de {{$vol->depart }} à {{ $vol->destination}}  le {{$vol->date_depart }} à {{ $vol->heure_depart}} 
-        </h3>
-        <P> pour finaliser votre reservation nous avons besion que vous remplissez se formulair. <br> <em>chaque champs est obliguatoire</em></p>
+    <div class="flight-summary">
+        <h2><i class="fas fa-ticket-alt"></i> Confirmation de vol</h2>
+        <div class="route-info">
+            <span>{{ $vol->depart }}</span>
+            <i class="fas fa-plane"></i>
+            <span>{{ $vol->destination }}</span>
+        </div>
+        <p style="margin-top:10px; opacity: 0.8; font-size: 0.9rem;">
+            Vol n°{{ $vol->id }} | Départ le {{ $vol->date_depart }} à {{ $vol->heure_depart }}
+        </p>
+    </div>
 
-        <label for="nom">Nom :</label>
-        <input type="text" id="nom" name="nom" required>
-
-        <label for="prenom">Prénom :</label>
-        <input type="text" id="prenom" name="prenom" required>
-
-        <label for="email">Email :</label>
-       <input type="email" id="email" name="email" required>
-
-        <label for="telephone">Téléphone :</label>
-        <input type="tel" id="telephone" name="telephone" required>
-
-        <label for="classe">Classe de vol :</label>
-        <div class="radio-group">
-            <label><input type="radio" name="classe" value="Économique" required> Économique</label>
-            <label><input type="radio" name="classe" value="Business"> Business</label>
-            <label><input type="radio" name="classe" value="Première Classe"> Première Classe</label>
+    <div class="booking-form">
+        <div class="info-alert">
+            <i class="fas fa-info-circle"></i> Veuillez remplir tous les champs obligatoires pour finaliser votre réservation en toute sécurité.
         </div>
 
-        <label for="nombre_places">Nombre de places :</label>
-        <input type="number" id="nombre_places" name="nombre_places" min="1" required>
+        @if ($errors->any())
+            <div class="alert alert-danger">
+               <ul>
+                   @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        <form action="{{ url('/form-reserver') }}" method="POST">
+            @csrf
+            <input type="hidden" name="vol_id" value="{{ $vol->id }}">
 
-        <label for="motif">Motif du voyage :</label>
-        <textarea id="motif" name="motif" rows="4" placeholder="Expliquez brièvement pourquoi vous effectuez ce voyage..."></textarea>
-        <label>Moyen de paiement :</label>
-        <div class="payment-methods">
-            <label><input type="radio" name="paiement" value="Orange Money" required> Orange Money
-                <img src="{{ asset('img/orange.png') }}" alt="Orange Money">
-            </label>
-            <label><input type="radio" name="paiement" value="Mobile Money"> MTN Mobile Money
-                <img src="{{ asset('img/mobile.png') }}" alt="MTN Mobile Money">
-            </label>
-            <label><input type="radio" name="paiement" value="Carte Bancaire"> Carte Bancaire
-                <img src="{{ asset('img/carte.jpeg') }}" alt="Carte Bancaire">
-            </label>
-        </div>
+            <div class="section-title">Informations Passager</div>
+            
+            <div class="row" style="display: flex; gap: 20px;">
+                <div class="form-group" style="flex: 1;">
+                    <label for="nom"">Nom</label>
+                    <input type="text" id="nom" name="nom"  required  value="{{old('nom')}}">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label for="prenom">Prénom</label>
+                    <input type="text" id="prenom" name="prenom"  required  value="{{old('prenom')}}">
+                </div>
+            </div>
 
-        <button type="submit">Valider la réservation</button>
-    </form>
+            <div class="row" style="display: flex; gap: 20px;">
+                <div class="form-group" style="flex: 1;">
+                    <label for="email">Email professionnel ou privé</label>
+                    <input type="email" id="email" name="email" placeholder="monemail@mail.com" required  value="{{old('email')}}">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label for="telephone">Téléphone</label>
+                    <input type="tel" id="telephone" name="telephone" placeholder="+237 *********" required  value="{{old('telephone')}}">
+                </div>
+            </div>
+
+            <div class="section-title">Options de Voyage</div>
+
+            <div class="form-group">
+                <label>Classe de voyage</label>
+                <div class="custom-radio-group">
+                    <label>
+                        <input type="radio" name="classe" value="Économique" checked required>
+                        <span>Économique</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="classe" value="Business">
+                        <span>Business</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="classe" value="Première Classe">
+                        <span>Première</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="nombre_places">Nombre de voyageurs</label>
+                <input type="number" id="nombre_places" name="nombre_places"  required>
+            </div>
+
+            <div class="section-title">Paiement Sécurisé</div>
+            
+            <div class="payment-grid">
+                <label class="payment-card">
+                    <input type="radio" name="paiement" value="Orange Money" required>
+                    <img src="{{ asset('img/orange.png') }}" alt="Orange">
+                    <span class="small">Orange Money</span>
+                </label>
+                <label class="payment-card">
+                    <input type="radio" name="paiement" value="Mobile Money">
+                    <img src="{{ asset('img/mobile.png') }}" alt="MTN">
+                    <span class="small">MTN Money</span>
+                </label>
+                <label class="payment-card">
+                    <input type="radio" name="paiement" value="Carte Bancaire">
+                    <img src="{{ asset('img/carte.jpeg') }}" alt="CB">
+                    <span class="small">Carte Bancaire</span>
+                </label>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                Confirmer ma réservation <i class="fas fa-chevron-right" style="margin-left: 10px;"></i>
+            </button>
+        </form>
+    </div>
 </div>
 
 </body>

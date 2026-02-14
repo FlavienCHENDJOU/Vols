@@ -3,27 +3,24 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Reservation; // Assurez-vous d'avoir un modèle Reservation
-use App\Models\Vol; // Le modèle Flight pour associer une réservation à un vol
+use App\Models\Reservation; 
+use App\Models\Vol; 
 use DB;
 
 class ReservationController extends Controller
 {
-    // Méthode pour afficher la page d'accueil
+    
     public function accueil()
     {
         return view('accueil'); 
     }
 
-    // Méthode pour afficher les vols dispognible
     public function vols_disponible()
     {
         $vols = Vol::all();
         return view('vols_disponible', compact('vols'));
     }
 
-
-    // Méthode pour afficher le formulaire de réservation
     public function reserver($vol_id)
     { 
         $vol = Vol::findOrFail($vol_id);
@@ -31,7 +28,6 @@ class ReservationController extends Controller
     }
     
 
-    // Méthode pour traiter la réservation
     public function formReserver(Request $request)
     {
         $validated = $request->validate([
@@ -41,12 +37,11 @@ class ReservationController extends Controller
             'telephone' => 'required|numeric', 
             'vol_id' => 'required|exists:vols,id', 
             'classe' => 'required|string',
-            'nombre_places' => 'required|integer|min:1 max:20',
+            'nombre_places' => 'required|integer|min:1|max:20',
             'paiement' => 'required|string',
             'motif' => 'nullable|string|max:1000',
         ]);
 
-        // Créer une réservation avec les données soumises
         $reservation = new Reservation();
         $reservation->nom = $validated['nom'];
         $reservation->prenom = $validated['prenom'];
@@ -56,9 +51,8 @@ class ReservationController extends Controller
         $reservation->classe =$validated['classe'];
         $reservation->nombre_places =$validated['nombre_places'];
         $reservation->paiement =$validated['paiement'];
-        $reservation->save();  
-        return redirect()->route('confirmation',['reservation_id' => $reservation->id])->with('success', 'Réservation effectuée avec succès !');
-    }
+
+        $reservation->save();  return redirect('/confirmation/' . $reservation->id)->with('success', 'Réservation effectuée avec succès !'); }
 
     public function confirmation($reservation_id)
     {
@@ -67,12 +61,34 @@ class ReservationController extends Controller
         return view('confirmation', compact('reservation', 'vol'));
     }
 
-    // Méthode pour afficher la page de reservation sauvegarder
     public function test_reservations()
     {
         $reservations = Reservation::all(); 
-        return view('test_reservations', compact('reservations')); 
+        return view('/test_reservations', compact('reservations')); 
     }
 
+    public function supprimerReservation($id)
+    {
+        $reservation = Reservation::findOrFail($id);
+        
+        // Optionnel : On rend la place au vol avant de supprimer
+        $vol = Vol::find($reservation->vol_id);
+        if($vol) {
+            $vol->places_disponibles += $reservation->nombre_places;
+            $vol->save();
+        }
+
+        $reservation->delete();
+
+        return redirect('/test_reservations')->with('info', 'Réservation annulée avec succès.');
+    }
    
+    public function mesReservations()
+    {
+        $userEmail = session('email'); 
+        $reservations = Reservation::where('email', $userEmail)->get();
+
+        return view('mes_reservations', compact('reservations'));
+    }
+
 }

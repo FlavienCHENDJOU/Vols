@@ -20,13 +20,13 @@
             <li class="nav-item">
                 <a class="nav-link" href="test_reservations">liste des réservations</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="confirmation/{reservation_id}'">Mes reservations</a>
+           <li class="nav-item">
+                <a class="nav-link" href="{{ url('/mes_reservations') }}">Mes réservations</a>
             </li>
         </ul>
         <a class="nav-link" href="admin">administrateur</a>
         
-        <!-- @if (session('nom') && session('prenom') && session('statut'))
+       @if (session('nom') && session('prenom') && session('statut'))
             <ul class="navbar-nav">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
@@ -42,6 +42,6 @@
             </ul>
         @else
             <a class="nav-link" href="connexion">connexion</a>
-        @endif -->
+        @endif 
     </div>
 </nav> 
