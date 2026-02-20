@@ -15,45 +15,50 @@ class UserController extends Controller
    
     public function index(){
         $user = Auth::user();
-        return view('infoUtilisateur', compact('user'));
+        $nbRes = \App\Models\Reservation::where('email', $user->email)->count();
+        $nbrpoints=50 * $nbRes;
+        return view('infoUtilisateur', compact('user', 'nbRes','nbrpoints'));
     }
+    
      
-    public function updateUserInfo(Request $request)
-    {
-         $user = Auth::user();
-         $request->validate([
-            'nom' => 'required|string|max:255',
-            'prenom' => 'required|string|max:255',
-            'mail' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:8', 
-        ]);
+   public function updateInfo(Request $request)
+{
+    $user = Auth::user();
+     if (!Hash::check($request->current_password, $user->password)) {
+        return back()->withErrors(['current_password' => 'Le mot de passe actuel est incorrect.']);
+    }
+     $request->validate([
+        'nom' => 'required|string|max:255',
+        'prenom' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email,' . $user->id,
+        'password' => 'nullable|min:6', 
+       ]);
 
-        $user = User::findOrFail($request->id);
-        $user->nom = $request->nom;
-        $user->prenom = $request->prenom;
-        $user->mail = $request->mail;
-        
-        if ($request->password) {
-            $user->password = bcrypt($request->password); 
-        }
+    $user->nom = $request->nom;
+    $user->prenom = $request->prenom;
+    $user->email = $request->email;
 
-        $user->save();
-
-        return redirect('/userinfo')->with('success', 'Profil mis à jour avec succès');
+    if ($request->filled('password')) {
+        $user->password = Hash::make($request->password);
     }
 
-    public function showReservation($id)
-    {
-        $reservation = Reservation::findOrFail($id);
-        $passager = Passager::findOrFail($reservation->passager_id);
-        $vol = Vol::findOrFail($reservation->vol_id);
+    $user->save();
 
-        $output = view('partials.passager_info', compact('passager'))->render();
-        $output2 = view('partials.vol_info', compact('vol'))->render();
+    return redirect()->back()->with('success', 'Vos informations ont été mises à jour avec succès !');
+}
+  public function updatePhoto(Request $request)
+{
+    $request->validate([
+        'photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
 
-        return response()->json(['passager' => $output, 'vol' => $output2]);
+    $user = auth()->user(); 
+
+    if ($request->hasFile('photo')) {
+        $path = $request->file('photo')->store('photos', 'public');
+         $user->update([   'photo' => $path ]);
     }
+    return back()->with('success', 'Votre photo de profil a été mise à jour !');
+}
 
-
-       
 }

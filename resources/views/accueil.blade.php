@@ -4,82 +4,10 @@
     <head>
         <title>Accueil - Plateforme de Réservation</title>
         <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
-        <link type="text/css" rel="stylesheet" href="css/style.css" />
+        <link type="text/css" rel="stylesheet" href="css/accueilstyle.css" />
     </head>
 
-    <style>
-        header {
-            background-color: #007bff;
-            color: black;
-            padding: 10px 0;
-            text-align: center;
-            border-bottom: 5px solid #ff5733;
-            margin: 20px;
-        }
-    
-        .img {
-            width: 20%;
-            max-height: 250px;
-            object-fit: cover;
-            border-radius: 20%;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .btn {
-            display: inline-block;
-            width: auto;
-            min-width: 200px;
-            margin: 30px auto;
-            padding: 15px 30px;
-            background-color: #ff5733;
-            border: none;
-            color: white;
-            border-radius: 50px;
-            font-size: 18px;
-            font-weight: bold;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 87, 51, 0.4);
-            
-        }
-
-        .btn:hover  {
-            background-color: #c70039;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(199, 0, 57, 0.6);
-        }
-        .form-btn {
-            text-align: center;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-        }
-        .booking-form {  
-            border-radius: 15px;
-            padding-top: 30px !important; 
-            margin-top: 20px;
-        }
-       
-        .alert-danger {
-            background-color: #fff1f0; 
-            color: #d85140; 
-            border: 1px solid #ffa39e;
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            list-style-position: inside; 
-        }
-
-        @media (max-width: 768px) {
-            .img {
-                display: none; 
-                }
-        }
-    </style>   
-
-    <body>
+    <<body style="background: url('{{ asset('/img/01.jpg') }}') no-repeat center center fixed; background-size: cover;">
         <header> 
             <h1>Compagnie Aérienne - Gestion des Réservations</h1>
             <p>Votre voyage commence ici. Sécurité, Confort et Rapidité.</p>

@@ -18,16 +18,25 @@ class ReservationController extends Controller
     public function vols_disponible()
     {
         $vols = Vol::all();
-        return view('vols_disponible', compact('vols'));
+        $user = auth()->user();
+       if ($user && ($user->hasRole('super_admin') || $user->hasRole('admin_vols') || $user->hasRole('admin_users'))) {
+            $layout = 'layouts.admin';  } else {
+            $layout = 'layouts.app';
+        }
+        return view('vols_disponible', compact('vols','layout'));
     }
 
-    public function reserver($vol_id)
+
+     public function reserver($vol_id)
     { 
         $vol = Vol::findOrFail($vol_id);
-        return view('reserver', compact('vol'));
+         $layout = auth()->user()->hasAnyRole(['admin_vols', 'admin_users', 'super_admin']) 
+              ? 'layouts/admin' 
+              : 'layouts/app';
+        return view('reserver', compact('vol', 'layout'));
     }
-    
 
+    
     public function formReserver(Request $request)
     {
         $validated = $request->validate([
@@ -61,17 +70,9 @@ class ReservationController extends Controller
         return view('confirmation', compact('reservation', 'vol'));
     }
 
-    public function test_reservations()
-    {
-        $reservations = Reservation::all(); 
-        return view('/test_reservations', compact('reservations')); 
-    }
-
     public function supprimerReservation($id)
     {
         $reservation = Reservation::findOrFail($id);
-        
-        // Optionnel : On rend la place au vol avant de supprimer
         $vol = Vol::find($reservation->vol_id);
         if($vol) {
             $vol->places_disponibles += $reservation->nombre_places;
@@ -85,10 +86,24 @@ class ReservationController extends Controller
    
     public function mesReservations()
     {
-        $userEmail = session('email'); 
-        $reservations = Reservation::where('email', $userEmail)->get();
+        $userEmail = auth()->user()->email;
+        $reservations = \App\Models\Reservation::where('email', $userEmail)
+                                ->orderBy('created_at', 'desc')
+                                ->get();
+        $nombreDeReservations = $reservations->count();
+        $layout = auth()->user()->hasAnyRole(['admin_vols', 'admin_users', 'super_admin']) 
+              ? 'layouts/admin' 
+              : 'layouts/app';
 
-        return view('mes_reservations', compact('reservations'));
+        return view('mes_reservations', [compact('reservations'),'reservations' => $reservations, 'nbRes' => $nombreDeReservations,'layout' => $layout] );
     }
 
+  
+
 }
+
+
+
+
+
+

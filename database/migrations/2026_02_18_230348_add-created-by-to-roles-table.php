@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddStatutToUsersTable extends Migration
+class AddCreatedByToRolesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,10 @@ class AddStatutToUsersTable extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {     
-        $table->string('statut')->default('User')->after('password');
-       });
+        Schema::table('roles', function (Blueprint $table) {
+        $table->unsignedBigInteger('created_by')->nullable()->after('guard_name');
+        $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+        });
     }
 
     /**
@@ -25,7 +26,6 @@ class AddStatutToUsersTable extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-        });
+        //
     }
 }

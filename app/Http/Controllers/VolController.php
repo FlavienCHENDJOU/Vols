@@ -2,57 +2,44 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
-use App\Models\Vol;          
+use App\Models\Vol;
+use Illuminate\Support\Facades\Auth;          
 use DB;
 
 class VolController extends Controller
 {
-    // Méthode pour afficher la page d'accueil avec le formulaire de recherche
-    public function accueil()
+     public function accueil()
     {
         return view('accueil');  
     }
    
-   
-    // Méthode pour traiter le formulaire de recherche de vols
-    public function rechercher(Request $request) 
+    public function index()
     {
-   
-    // Validation des entrées du 
-    $formulairevalidated = $request->validate([
-        'destination' => 'required|string',
-        'date' => 'required|date',
-    ]);
+        $vols = Vol::paginate(20);
+        $layout = 'layouts.admin';
+        return view('adminvols', compact('vols', 'layout'));
+    }
 
-    // Recherche des vols en fonction des 
-    $critèresvols = Vol::where('destination', 'like', '%' . validated['destination'] )
-        ->where('date',validated['date'])
-        ->get();
-
-    // Rediriger vers la page des résultats
-    return view('resultats', compact('vols'));
-
-   // Logique pour traiter le formulaire de recherche
     
-    }
 
-
-    public function resultats(Request $request)
-    {
-        return view('resultats') ;  // Logique pour récupérer les vols et les afficher
-    }
 
     public function details($id)
     {
          
         $vol = Vol::findOrFail($id);
+        $layout = $this->getDynamicLayout();
         return view('details', compact('vol'));
-       // Logique pour afficher les détails d'un vol
     }
-
+    
+    private function getDynamicLayout()
+    {
+        if (Auth::check() && Auth::user()->hasAnyRole(['admin_vols', 'admin_users', 'super_admin'])) {
+            return 'layouts.admin';
+        }
+        return 'layouts.app';
+    }
    
 } 
 
     
-        
 

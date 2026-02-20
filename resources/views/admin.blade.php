@@ -1,69 +1,74 @@
 
-@extends('layouts/app')
+@extends('layouts/admin')
 
-@section('title', 'Mon Espace Personnel | ' . $user->prenom)
+@php
+    $roleName = $admin->getRoleNames()->first();
+    $displayRole = 'Utilisateur';
+
+    if ($roleName == 'super_admin') $displayRole = 'Super Administrateur';
+    if ($roleName == 'admin_vols') $displayRole = 'Gestionnaire des Vols';
+    if ($roleName == 'admin_users') $displayRole = 'Gestionnaire Utilisateurs';
+@endphp
+
+@section('title', "Espace $displayRole | $admin->prenom")
 
 @section('content')
 
-<div class="profile-header shadow">
-    <div class="profile-avatar-wrapper">
-        <div class="avatar-circle position-relative">
-            <img id="avatar-preview" src="{{ $user->photo ? asset('storage/' . $user->photo) : asset('img/default-avatar.png') }}" 
-                 style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
-            
-            <label for="photo-upload" class="photo-change-overlay">
-                <img src="{{ asset('img/edit.png') }}" alt="Changer la photo" class="icon-change">
-            </label>
+    <div class="profile-header shadow">
+        <div class="profile-avatar-wrapper">
+            <div class="avatar-circle position-relative">
+                <img id="avatar-preview" src="{{ $admin->photo ? asset('storage/' . $admin->photo) : asset('img/default-avatar.png') }}" 
+                    style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                
+                <label for="photo-upload" class="photo-change-overlay">
+                    <img src="{{ asset('img/edit.png') }}" alt="Changer la photo" class="icon-change">
+                </label>
 
-            <form id="photo-form" action="{{ url('/profil/update-photo') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <input type="file" id="photo-upload" name="photo" accept="image/*" style="display: none;" onchange="previewAndSubmit(this)">
-            </form>
-        </div>
-        
-        <div class="user-welcome">
-            <h2 class="mb-0 text-white text-shadow">{{ $user->prenom }} {{ $user->nom }}</h2>
-            <span class="badge-status bg-white mt-1 d-inline-block">
-                <i class="fas fa-star me-1" style="color: #ff5733;"></i> Membre {{ $user->statut }}
-            </span>
+                <form id="photo-form" action="{{ url('/profil/update-photo') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <input type="file" id="photo-upload" name="photo" accept="image/*" style="display: none;" onchange="previewAndSubmit(this)">
+                </form>
+            </div>
+            
+            <div class="user-welcome">
+                <h2 class="mb-0 text-white text-shadow">{{ $admin->prenom }} {{ $admin->nom }}</h2>
+                <span class="badge-status bg-white mt-1 d-inline-block p-1 px-2 rounded">
+                    <i class="fas fa-shield-alt me-1" style="color: #ff5733;"></i>
+                    Rôle : <span class="text-dark fw-bold">{{Auth::user()->roles->pluck('name')->map(function($role){  return ucfirst(str_replace('_', ' ', $role)); })->first() ?? 'Administrateur' }}</span>
+                    
+                </span>
+            </div>
+
         </div>
     </div>
-</div>
-    
-<div class="row">
-    <div class="col-lg-4">
-        <h5 class="fw-bold mb-3">Tableau de bord</h5>
-        <div class="row mb-4">
-            <div class="col-6">
-                <div class="stat-card">
-                    <i class="fas fa-plane-departure stat-icon"></i>
-                    <div class="h5 mb-0">{{ $nbRes }}</div>
-                    <div class="small text-muted">Vols</div>
+        
+    <div class="row mt-4">
+        <div class="col-lg-4">
+            <h5 class="fw-bold mb-3">Statistiques Globales</h5>
+            <div class="row mb-4">
+                <div class="col-6">
+                    <div class="stat-card p-3 shadow-sm border rounded bg-white">
+                        <i class="fas fa-plane-departure text-primary mb-2"></i>
+                        <div class="h5 mb-0">{{ $nbRes }}</div>
+                        <div class="small text-muted">Réservations</div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-6">
-                <div class="stat-card">
-                    <i class="fas fa-coins stat-icon"></i>
-                    <div class="h5 mb-0">{{$nbrpoints}} </div>
-                    <div class="small text-muted">Points</div>
+                <div class="col-6">
+                    <div class="stat-card p-3 shadow-sm border rounded bg-white">
+                        <i class="fas fa-plane-departure text-primary mb-2"></i>
+                        <div class="h5 mb-0">{{ $nbUsers }}</div>
+                        <div class="small text-muted">Users</div>
+                    </div>
                 </div>
-            </div>
-        </div>
-
-        <div id="sideCarousel" class="carousel slide mb-4 shadow-sm" data-bs-ride="carousel">
-            <div class="carousel-inner rounded-4">
-                <div class="carousel-item active">
-                    <img src="{{ asset('img/image1.jpeg') }}" class="d-block w-100" alt="Promo">
-                </div>
-                <div class="carousel-item">
-                    <img src="{{ asset('img/image2.jpeg') }}" class="d-block w-100" alt="Destinations">
-                    <div class="carousel-caption d-none d-md-block bg-dark-50 rounded">
-                        <p class="mb-0">Les meilleurs hôtels</p>
+                <div class="col-6">
+                    <div class="stat-card p-3 shadow-sm border rounded bg-white">
+                        <i class="fas fa-ticket-alt text-success mb-2"></i>
+                        <div class="h5 mb-0">{{ $nbVols }}</div>
+                        <div class="small text-muted">Vols Totaux</div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </div> 
      
     <div class="col-lg-8">
         <div class="card main-card">
@@ -92,7 +97,7 @@
                        <div class="col-md-6">
                             <label class="form-label small fw-bold">Nom</label>
                             <div class="input-group">
-                                <input name="nom" id="input-nom" value="{{ $user->nom }}" class="form-control" readonly required>
+                                <input name="nom" id="input-nom" value="{{ $admin->nom }}" class="form-control" readonly required>
                                 <span class="input-group-text bg-white" onclick="enableInput('input-nom')" style="cursor:pointer">
                                     <img src="{{ asset('img/edit.png') }}" style="width: 20px;">
                                 </span>
@@ -101,7 +106,7 @@
                        <div class="col-md-6">
                             <label class="form-label small fw-bold">Prénom</label>
                             <div class="input-group">
-                                <input name="prenom" id="input-prenom" value="{{ $user->prenom }}" class="form-control" readonly required>
+                                <input name="prenom" id="input-prenom" value="{{ $admin->prenom }}" class="form-control" readonly required>
                                 <span class="input-group-text bg-white" onclick="enableInput('input-prenom')" style="cursor:pointer">
                                     <img src="{{ asset('img/edit.png') }}" style="width: 20px;">
                                 </span>
@@ -112,7 +117,8 @@
                             <label class="form-label small fw-bold">Adresse E-mail</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-white"><i class="far fa-envelope text-muted"></i></span>
-                                <input name="email" id="input-email" type="email" value="{{ $user->email }}" class="form-control" readonly required>
+                                <input name="email" id="input-email" type="email" value="{{ $admin->email }}" class="form-control" readonly required>
+                              
                             </div>
                         </div>
                         <div class="col-12">
@@ -139,8 +145,8 @@
                     </div>
 
                     <div class="text-end mt-3">
-                        <button type="button" id="btn-submit-form" class="btn btn-update px-5">
-                            Enregistrer les modifications
+                         <button type="button" class="btn btn-update-premium" id="btn-submit-form">
+                            <i class="fas fa-plus-circle me-2"></i> Enregistrer les modifications
                         </button>
                     </div>
                 </form>
@@ -152,7 +158,6 @@
 <script>
   let hasChanged = false; 
 
-// Surveiller les changements manuels dans les champs
 document.querySelectorAll('.form-control').forEach(input => {
     input.addEventListener('input', () => {
         hasChanged = true;

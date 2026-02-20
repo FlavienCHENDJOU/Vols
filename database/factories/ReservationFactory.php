@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Vol;
 
 class ReservationFactory extends Factory
 {
@@ -14,7 +15,7 @@ class ReservationFactory extends Factory
     public function definition()
     {
         return [
-        'vol_id' => \App\Models\Vol::inRandomOrder()->first()->id, // associe à un vol existant
+        'vol_id' => Vol::inRandomOrder()->first()->id, 
         'nom' => $this->faker->lastName,
         'prenom' =>$this->faker->firstName,
         'email' => $this->faker->unique()->safeEmail,

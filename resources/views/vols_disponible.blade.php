@@ -1,250 +1,117 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Vols Disponibles - AeroFlight</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link type="text/css" rel="stylesheet" href="css/style.css" />
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+
+@extends($layout)
+
+@section('title', 'Vols Disponibles - AeroFlight')
+
+@section('content')
+   
+<link type="text/css" rel="stylesheet" href="{{asset('css/style.css')}}" />
+
+
     
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f0f2f5;
-            padding: 40px 20px;
-            color: #333;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .header-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        h1 {
-            color: #1e293b;
-            margin: 0;
-            font-weight: 600;
-        }
-
-        .btn-back {
-            text-decoration: none;
-            color: #64748b;
-            font-weight: 500;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-        }
-        .btn-back:hover { color: #ff5733; }
-        .btn-back i { margin-right: 8px; }
-
-        ul { list-style: none; padding: 0; }
-
-        li {
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid rgba(0,0,0,0.03);
-        }
-
-        li:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-        }
-
-        .info-vol { flex: 1; }
-
-        .route {
-            display: flex;
-            align-items: center;
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 10px;
-        }
-
-        .route i {
-            margin: 0 15px;
-            color: #cbd5e1;
-            font-size: 0.9rem;
-        }
-
-        .details-time {
-            color: #64748b;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-        }
-
-        .details-time i { color: #ff5733; width: 20px; }
-
-        .actions { display: flex; gap: 10px; }
-
-        .btn {
-            padding: 10px 20px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.9rem;
-            transition: 0.3s;
-        }
-
-        .btn-reserve {
-            background-color: #ff5733;
-            color: white;
-            box-shadow: 0 4px 12px rgba(255, 87, 51, 0.2);
-        }
-        .btn-reserve:hover { background-color: #e64a19; }
-
-        .btn-details {
-            background-color: #f1f5f9;
-            color: #475569;
-        }
-        .btn-details:hover { background-color: #e2e8f0; }
-
-        .img-container {
-            width: 150px;
-            height: 100px;
-            overflow: hidden;
-            border-radius: 15px;
-            margin-left: 20px;
-        }
-
-        .img-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        @media (max-width: 600px) {
-            li { flex-direction: column; text-align: center; }
-            .img-container { margin: 20px 0; width: 100%; }
-            .route { justify-content: center; }
-        }
-    </style>
-</head>
-<body  id="booking">
-
+<div class="sticky-search shadow-sm">
     <div class="container">
-        <div class="header-section">
-            <a href="{{ url('/infoUtilisateur') }}" class="btn-back">
-                 <i class="fas fa-arrow-left"></i> 
-                 Retour au profil
-            </a>
-            <h1>Vols disponibles</h1>
+        <div class="search-container bg-white p-2 rounded-4 border">
+            <div class="input-group">
+                <span class="input-group-text bg-transparent border-0"><i class="fas fa-search text-primary"></i></span>
+                <input type="text" id="searchInput" class="form-control border-0 shadow-none" placeholder="Chercher une ville, un pays..." onkeyup="filterVols()">
+            </div>
         </div>
+    </div>
+</div>
 
-            <ul>
-                 @foreach ($vols as $vol)
-                <li>
-                    <div class="info-vol">
-                        <div class="route">
-                            {{ $vol->depart }} 
-                            <i class="fas fa-plane"></i> 
-                            {{ $vol->destination }}
+<div class="container mt-4">
+    <ul class="vol-list p-0" id="volList">
+        @foreach ($vols as $vol)
+        <li class="vol-item vol-card" data-search="{{ strtolower($vol->depart) }} {{ strtolower($vol->destination) }}">
+            <div class="info-vol">
+                <div class="route">
+                    <span class="vol-number">#{{ $loop->iteration }}</span>
+                    {{ $vol->depart }} <i class="fas fa-plane"></i> {{ $vol->destination }}
+                </div>
+                
+                <div class="details-time">
+                    <div><i class="far fa-calendar-alt"></i> {{ $vol->date_depart }}</div>
+                    <div><i class="far fa-clock"></i> {{ $vol->heure_depart }}</div>
+                </div>
+
+                <div class="actions d-flex gap-2">
+                    <a href="{{ url('/reserver/' . $vol->id) }}" class="btn btn-reserve">
+                        <i class="fas fa-ticket-alt"></i> Réserver
+                    </a>
+                    <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#modalVol{{ $vol->id }}">
+                        <i class="fas fa-info-circle"></i> Détails
+                    </button>
+                </div>
+            </div>
+          
+            <div class="img-container d-none d-md-block">
+                <img src="{{ asset('img/volimage.jpeg') }}" alt="Aperçu vol">
+            </div>
+
+            <div class="modal fade" id="modalVol{{ $vol->id }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+                        <div class="modal-header border-0 bg-light">
+                            <h5 class="modal-title fw-bold">Vol #{{ $loop->iteration }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        
-                        <div class="details-time">
-                            <div><i class="far fa-calendar-alt"></i> {{ $vol->date_depart }}</div>
-                            <div><i class="far fa-clock"></i> {{ $vol->heure_depart }}</div>
-                        </div>
-
-                        <div class="actions">
-                            <a href="{{ url('/reserver/' . $vol->id) }}" class="btn btn-reserve">
-                                <i class="fas fa-ticket-alt"></i> Réserver
-                            </a>
-
-                            <button type="button" class="btn btn-details" data-toggle="modal" data-target="#modalVol{{ $vol->id }}">
-                                <i class="fas fa-info-circle"></i> Détails
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="img-container">
-                        <img src="{{ asset('img/volimage.jpeg') }}" alt="Aperçu vol">
-                    </div>
-
-                    <div class="modal fade" id="modalVol{{ $vol->id }}" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
-                        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                            <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden;">
-                                
-                                <div class="modal-header" style="background: #f8f9fa;">
-                                    <h5 class="modal-title" style="font-weight: 600;">
-                                        <i class="fas fa-plane text-primary mr-2"></i> Fiche du Vol #{{ $vol->id }}
-                                    </h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
+                        <div class="modal-body p-4">
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <h4 class="fw-bold text-primary">{{ $vol->depart }} ➔ {{ $vol->destination }}</h4>
+                                    <p><strong>Prix:</strong> {{ $vol->prix }} €</p>
+                                    <p><strong>Places:</strong> {{ $vol->places_disponibles }}</p>
+                                    <p><strong>Date:</strong> {{ $vol->date_depart }}</p>
+                                    <p><strong>heure:</strong>  {{ $vol->heure_depart }}</p>
                                 </div>
-
-                                <div class="modal-body p-4 text-left">
-                                    <div class="row">
-                                        <div class="col-md-7">
-                                            <div class="mb-3">
-                                                <span class="badge badge-primary">Trajet Officiel</span>
-                                                <h4 class="mt-2" style="font-weight: 700;">{{ $vol->depart }} <i class="fas fa-arrow-right mx-2 text-muted"></i> {{ $vol->destination }}</h4>
-                                            </div>
-                                            
-                                            <div class="row">
-                                                <div class="col-6 border-right">
-                                                    <p class="small text-muted mb-0">Date de départ</p>
-                                                    <p><strong>{{ $vol->date_depart }}</strong></p>
-                                                </div>
-                                                <div class="col-6 pl-4">
-                                                    <p class="small text-muted mb-0">Heure locale</p>
-                                                    <p><strong>{{ $vol->heure_depart }}</strong></p>
-                                                </div>
-                                            </div>
-
-                                            <hr>
-                                            
-                                            <p><i class="fas fa-map-marker-alt text-danger mr-2"></i> <strong>Aéroport :</strong> {{ $vol->pays_depart }}</p>
-                                            <p><i class="fas fa-chair text-info mr-2"></i> <strong>Disponibilité :</strong> {{ $vol->places_disponibles }} places</p>
-                                            <p><i class="fas fa-building text-warning mr-2"></i> <strong>Compagnie :</strong> {{ $vol->compagnie ?? 'AeroFlight' }}</p>
-                                        </div>
-                                        
-                                        <div class="col-md-5">
-                                            <img src="{{ asset('img/volimage.jpeg') }}" class="img-fluid rounded shadow" alt="Vol">
-                                            <div class="alert alert-warning mt-3 small">
-                                                <i class="fas fa-exclamation-triangle"></i> Réservation non remboursable à moins de 24h.
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="modal-footer" style="background: #f8f9fa;">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal" style="border-radius: 10px;">Fermer</button>
-                                    <a href="{{ url('/reserver/' . $vol->id) }}" class="btn btn-reserve" style="padding: 10px 25px;">
-                                        Confirmer la sélection
-                                    </a>
+                                <div class="col-md-5 text-center">
+                                    <img src="{{ asset('img/volimage.jpeg') }}" class="img-fluid rounded shadow">
                                 </div>
                             </div>
                         </div>
                     </div>
-                </li>
-            @endforeach
-        </ul>
+                </div>
+            </div>
+        </li>
+        @endforeach
+    </ul>
+    
+    <div id="noResult" class="text-center py-5">
+        <i class="fas fa-plane-slash fa-5x mb-4 text-danger"></i>
+        <h2 class="fw-bold text-white">VOLS INEXISTANTS</h2>
+        <p class="text-white">Aucun vol ne correspond à votre recherche pour le moment.</p>
     </div>
+</div>
 
-    @include('script')
-</body>
-</html>
+<script>
+function filterVols() {
+    let input = document.getElementById('searchInput').value.toLowerCase();
+    let cards = document.getElementsByClassName('vol-card');
+    let noResult = document.getElementById('noResult');
+    let volList = document.getElementById('volList');
+    let hasMatch = false;
 
+    for (let i = 0; i < cards.length; i++) {
+        let content = cards[i].getAttribute('data-search');
+        if (content.includes(input)) {
+            cards[i].style.display = ""; 
+            hasMatch = true;
+        } else {
+            cards[i].style.display = "none";
+        }
+    }
 
+    if (hasMatch) {
+        noResult.style.display = "none";
+        volList.style.display = "block";
+    } else {
+        noResult.style.display = "flex";
+        volList.style.display = "none";
+    }
+}
+</script>
 
-
+@endsection
 
 

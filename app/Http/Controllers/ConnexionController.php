@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Hash;
 class ConnexionController extends Controller
 {
     
-    // Enregistrement d'un nouvel utilisateur
     public function register(Request $request)
     { 
         
@@ -30,8 +29,7 @@ class ConnexionController extends Controller
             'password' => Hash::make($request->password), 
             'statut'   => 'User', 
         ]);
-
-
+        
        return redirect('/connexion')->with('success', 'Votre compte a été créé avec succès !');
     }
 
@@ -39,7 +37,7 @@ class ConnexionController extends Controller
         return view('connexion');
     }
 
-    // Authentification d'un utilisateur
+    
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -48,16 +46,21 @@ class ConnexionController extends Controller
         ]);
 
         if (Auth::attempt($credentials)) {
-           $request->session()->regenerate();
+            $request->session()->regenerate();
+            
+            $user = Auth::user();
 
-        return redirect()->intended('/infoUtilisateur')->with('success', 'Heureux de vous revoir !');
+             if ($user->hasAnyPermission(['voir-vols', 'voir-reservations', 'voir-utilisateurs', 'gerer-roles-permissions'])) {
+                return redirect()->intended('/admin')->with('success', 'Bienvenue dans l\'espace Administration !');
+            }
+
+            return redirect()->intended('/infoUtilisateur')->with('success', 'Heureux de vous revoir !');
         }
 
         return back()->withErrors([
-             'email' => 'Désolé, l\'email ou le mot de passe ne correspond pas.',
+            'email' => 'Désolé, l\'email ou le mot de passe ne correspond pas.',
         ])->onlyInput('email'); 
     }
 
 }
      
-   

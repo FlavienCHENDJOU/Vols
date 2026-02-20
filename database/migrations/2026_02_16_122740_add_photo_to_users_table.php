@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddStatutToUsersTable extends Migration
+class AddPhotoToUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class AddStatutToUsersTable extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {     
-        $table->string('statut')->default('User')->after('password');
-       });
+        Schema::table('users', function (Blueprint $table) {
+        $table->string('photo')->nullable()->after('email');
+        });
     }
 
     /**
@@ -26,6 +26,7 @@ class AddStatutToUsersTable extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
+            //
         });
     }
 }
