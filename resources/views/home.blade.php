@@ -4,120 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Page d'Accueil - Réservations</title>
-    <style>
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
-                        url('img/background.jpg') no-repeat center center fixed;
-            background-size: cover;
-            color: white;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-       .container {
-            max-width: 900px;
-            width: 90%;
-            margin: 40px auto;
-            background: rgba(255, 255, 255, 0.1);                 /* Effet de verre (Glassmorphism) */
-            backdrop-filter: blur(15px); 
-            -webkit-backdrop-filter: blur(15px);
-            padding: 40px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-        }
-        h1 {
-            font-size: 2.5rem;
-            font-style: italic;
-            font-weight: bold;
-            margin: 0px 100px 0px 120px;
-            text-decoration: underline;
-            text-align: center;
-            text-transform: uppercase; 
-            letter-spacing: 0,5cm;
-            word-spacing: 0,5cm;
-            border:10px dashed rgba(255, 255, 255, 0.42);
-            margin: 0px 100px 0px 120px
-        }
-        
-
-        h2 {
-            font-weight: 300;
-            opacity: 0.9;
-            font-size: 1.2rem;
-        }
-        
-        .moving-text {
-            position: absolute;
-            bottom: 10px;
-            left: 100%;
-            background: rgba(255, 255, 255, 0.7);
-            color: black;
-            padding: 10px;
-            border-radius: 5px;
-            white-space: nowrap;
-        }
-        .button {
-            display: block;
-            width: 200px;
-            margin: 30px auto;
-            padding: 15px;
-            text-align: center;
-            background-color: #ff5733;
-            color: white;
-            border: none;
-            border-radius: 50px;
-            font-size: 18px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background-color 0.3s;
-        }
-        .button:hover {
-            background-color: #c70039;
-        }
-
-        .image-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 20px 0;
-        }
-
-        .image-section {
-            position: relative;
-            flex: 1; 
-            margin: 0 10px;
-        }
-
-        .image-section img {
-            width: 100%;
-            border-radius: 8px;
-            transition: transform 0.5s;
-        }
-
-        .image-section img:hover {
-            transform: scale(1.05);
-        }
-
-        .moving-text {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.7);
-            color: black;
-            padding: 10px;
-            border-radius: 5px;
-            white-space: nowrap;
-        }
-    </style>
+    <link type="text/css" rel="stylesheet" href="{{asset('css/homestyle.css')}}" />
+    
 </head>
 <body>
+    
     <div class="container">
         <h1>🚨 ☄️🛫  <br> Compagnie aérienne de réservation <br> ✈️ ☄️🚨</h1>
         <h4>Vous avez la possibilité d'effectuer des réservations partout dans le monde en un seul clic. <br> Votre confort et votre sécurité sont notre priorité.</h4>
@@ -170,7 +61,9 @@
             </div>
         </div>
 
-        <a href="accueil" class="button">Commencer l'Essai</a>
+        <a href="{{ url('accueil')}}" class="button">Commencer l'Essai</a>
+        <a href="{{ url('connexion') }}" class="button">Connectez-vous</a></p>
+                                    
     </div>
 
 </body>

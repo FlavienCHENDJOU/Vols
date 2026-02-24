@@ -14,6 +14,6 @@ class VolSeeder extends Seeder
      */
     public function run()
     {
-        Vol::factory()->count(50)->create();  
+       Vol::factory()->count(1000)->create();  
     }
 }

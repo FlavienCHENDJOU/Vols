@@ -1,10 +1,14 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const menuToggle = document.getElementById('menu-toggle');
+    const wrapper = document.getElementById('wrapper');
 
-   $("#menu-toggle").click(function (e) {
-    e.preventDefault();
-    $("#wrapper").toggleClass("toggled");
+    if (menuToggle) {
+        menuToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            wrapper.classList.toggle('toggled');
+        });
+    }
 });
-
- 
 
 
 

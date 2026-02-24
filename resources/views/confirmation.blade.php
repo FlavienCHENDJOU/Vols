@@ -1,94 +1,97 @@
+@extends('layouts/app')
 
+@section('title', 'Confirmation de Réservation | AeroFlight')
 
- <!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirmation de Réservation</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #2c3e50;
-            color: #ecf0f1;
-            margin: 0;
-            padding: 0;
-        }
+@section('content')
 
-        .container {
-            width: 80%;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        header {
-            background-color: #34495e;
-            padding: 20px 0;
-            text-align: center;
-        }
-
-        header .logo {
-            width: 100px;
-            margin-bottom: 10px;
-        }
-
-        h1 {
-            font-size: 2.5em;
-            margin: 0;
-        }
-
-        .reservation-details {
-            background-color: #34495e;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-
-        footer {
-            background-color: #34495e;
-            text-align: center;
-            padding: 20px 0;
-        }
-
-        footer .btn {
-            background-color: #e74c3c;
-            color: #fff;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 1.2em;
-        }
-        footer .btn:hover {
-            background-color: #c0392b;
-        }
-
-    </style>
-</head>
-<<body>
-    <header>
-        <div class="container">
-            <img src="{{ asset('image/volimage.jpeg') }}" alt="Logo de l'entreprise" class="logo">
-            <h1>Félicitations, {{ $reservation->prenom }} ! <br> Votre réservation a ete effectue avec succes</h1>
+<div class="confirmation-wrapper">
+    <div class="ticket-card animate__animated animate__zoomIn">
+        <div class="ticket-header">
+            <i class="fas fa-check-circle"></i>
+            <h1>Réservation Confirmée !</h1>
+            <p class="mb-0">Bon voyage, {{ $reservation->prenom }}</p>
         </div>
-    </header>
 
-    <section class="reservation-details">
-        <div class="container">
-            <p>Réservation de {{ $reservation->nombre_places }} place(s) en classe {{ $reservation->classe }}  par {{ $reservation->nom }} {{ $reservation->prenom }} payer via {{ $reservation->paiement }}.</p>
-            <p>Pour le vol numero {{ $reservation->vol_id }}, de {{ $vol->depart }} à {{ $vol->destination }}, de {{ $vol->pays_depart }} à {{ $vol->pays_arrivee }}.</p>
-            <p>Départ prévu le {{ \Carbon\Carbon::parse($vol->date_depart)->format('d/m/Y') }} à {{ $vol->heure_depart }}.</p>
-            <p>Nous contacterons en cas de changement via votre email : {{ $reservation->email }} ou votre  via numéro : {{ $reservation->telephone }}.</p>
-            <p>Nous vous remercions pour cette reservation</p>
-            <h2> bon voyage</h2>
+        <div class="ticket-body">
+            <div class="status-badge">Billet Électronique #{{ $reservation->id }}</div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Passager</label>
+                    <span>{{ $reservation->nom }} {{ $reservation->prenom }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Vol</label>
+                    <span>{{ $vol->depart }} <i class="fas fa-arrow-right mx-1" style="font-size: 0.7rem;"></i> {{ $vol->destination }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Date & Heure</label>
+                    <span>{{ \Carbon\Carbon::parse($vol->date_depart)->format('d/m/Y') }} à {{ $vol->heure_depart }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Classe & Places</label>
+                    <span>{{ $reservation->classe }} ({{ $reservation->nombre_places }} siège(s))</span>
+                </div>
+                <div class="info-item">
+                    <label>Paiement</label>
+                    <span>Via {{ $reservation->paiement }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Contact</label>
+                    <span>{{ $reservation->email }}</span>
+                </div>
+            </div>
         </div>
-    </section>
 
-    <footer>
-        <div class="container">
-            <a href="/infoUtilisateur" class="btn">Retour à l'accueil</a>
+        <div class="redirect-section">
+            <p id="timer-text" class="text-muted">Redirection vers votre profil dans <strong>10</strong> secondes...</p>
+            <div class="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+            
+            <form id="cancelForm" action="{{ url('/reservation/supprimer/' . $reservation->id) }}" method="POST">
+                @csrf
+                @method('DELETE') 
+                <button type="button" class="btn btn-cancel" onclick="confirmCancel()">
+                    <i class="fas fa-times me-2"></i> Annuler la réservation
+                </button>
+            </form>
         </div>
-    </footer>
-</body>
-</html>
+    </div>
+</div>
+@endsection
 
+@push('scripts')
+<script>
+    let timeLeft = 10;
+    let isCancelled = false;
+    const progressBar = document.getElementById('progress-bar');
+    const timerText = document.querySelector('#timer-text strong');
+    const redirectUrl = "{{ Auth::user()->hasAnyRole(['admin_vols', 'admin_users', 'super_admin']) ? url('/admin') : url('/infoUtilisateur') }}";
 
+    const countdown = setInterval(() => {
+        if (!isCancelled) {
+            timeLeft--;
+            if (timeLeft >= 0) {
+                if(timerText) timerText.innerText = timeLeft;
+                let width = (timeLeft / 10) * 100;
+                progressBar.style.width = width + '%';
+            }
+
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                window.location.href = redirectUrl; 
+            }
+        }
+    }, 1000);
+
+    function confirmCancel() {
+        const choice = confirm("Voulez-vous vraiment annuler votre réservation ?");
+        if (choice) {
+            isCancelled = true;
+            clearInterval(countdown);
+            document.getElementById('cancelForm').submit();
+        }
+    }
+</script>
+@endpush

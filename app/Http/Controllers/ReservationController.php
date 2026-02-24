@@ -3,35 +3,40 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Reservation; // Assurez-vous d'avoir un modèle Reservation
-use App\Models\Vol; // Le modèle Flight pour associer une réservation à un vol
+use App\Models\Reservation; 
+use App\Models\Vol; 
 use DB;
 
 class ReservationController extends Controller
 {
-    // Méthode pour afficher la page d'accueil
+    
     public function accueil()
     {
         return view('accueil'); 
     }
 
-    // Méthode pour afficher les vols dispognible
     public function vols_disponible()
     {
         $vols = Vol::all();
-        return view('vols_disponible', compact('vols'));
+        $user = auth()->user();
+       if ($user && ($user->hasRole('super_admin') || $user->hasRole('admin_vols') || $user->hasRole('admin_users'))) {
+            $layout = 'layouts.admin';  } else {
+            $layout = 'layouts.app';
+        }
+        return view('vols_disponible', compact('vols','layout'));
     }
 
 
-    // Méthode pour afficher le formulaire de réservation
-    public function reserver($vol_id)
+     public function reserver($vol_id)
     { 
         $vol = Vol::findOrFail($vol_id);
-        return view('reserver', compact('vol'));
+         $layout = auth()->user()->hasAnyRole(['admin_vols', 'admin_users', 'super_admin']) 
+              ? 'layouts/admin' 
+              : 'layouts/app';
+        return view('reserver', compact('vol', 'layout'));
     }
-    
 
-    // Méthode pour traiter la réservation
+    
     public function formReserver(Request $request)
     {
         $validated = $request->validate([
@@ -41,12 +46,11 @@ class ReservationController extends Controller
             'telephone' => 'required|numeric', 
             'vol_id' => 'required|exists:vols,id', 
             'classe' => 'required|string',
-            'nombre_places' => 'required|integer|min:1 max:20',
+            'nombre_places' => 'required|integer|min:1|max:20',
             'paiement' => 'required|string',
             'motif' => 'nullable|string|max:1000',
         ]);
 
-        // Créer une réservation avec les données soumises
         $reservation = new Reservation();
         $reservation->nom = $validated['nom'];
         $reservation->prenom = $validated['prenom'];
@@ -56,9 +60,8 @@ class ReservationController extends Controller
         $reservation->classe =$validated['classe'];
         $reservation->nombre_places =$validated['nombre_places'];
         $reservation->paiement =$validated['paiement'];
-        $reservation->save();  
-        return redirect()->route('confirmation',['reservation_id' => $reservation->id])->with('success', 'Réservation effectuée avec succès !');
-    }
+
+        $reservation->save();  return redirect('/confirmation/' . $reservation->id)->with('success', 'Réservation effectuée avec succès !'); }
 
     public function confirmation($reservation_id)
     {
@@ -67,12 +70,40 @@ class ReservationController extends Controller
         return view('confirmation', compact('reservation', 'vol'));
     }
 
-    // Méthode pour afficher la page de reservation sauvegarder
-    public function test_reservations()
+    public function supprimerReservation($id)
     {
-        $reservations = Reservation::all(); 
-        return view('test_reservations', compact('reservations')); 
+        $reservation = Reservation::findOrFail($id);
+        $vol = Vol::find($reservation->vol_id);
+        if($vol) {
+            $vol->places_disponibles += $reservation->nombre_places;
+            $vol->save();
+        }
+
+        $reservation->delete();
+
+        return redirect('/test_reservations')->with('info', 'Réservation annulée avec succès.');
+    }
+   
+    public function mesReservations()
+    {
+        $userEmail = auth()->user()->email;
+        $reservations = \App\Models\Reservation::where('email', $userEmail)
+                                ->orderBy('created_at', 'desc')
+                                ->get();
+        $nombreDeReservations = $reservations->count();
+        $layout = auth()->user()->hasAnyRole(['admin_vols', 'admin_users', 'super_admin']) 
+              ? 'layouts/admin' 
+              : 'layouts/app';
+
+        return view('mes_reservations', [compact('reservations'),'reservations' => $reservations, 'nbRes' => $nombreDeReservations,'layout' => $layout] );
     }
 
-   
+  
+
 }
+
+
+
+
+
+

@@ -16,10 +16,12 @@ class VolFactory extends Factory
         return [
         'depart' => $this->faker->city,
         'destination' =>$this->faker->city,
-        'date_depart' => $this->faker->date(),
+        'date_depart' => $this->faker->dateTimeBetween('now', '+12 months'),
         'heure_depart' =>$this->faker->time(),
-        'places_disponibles' => $this->faker->numberBetween(10, 150),
+        'places_disponibles' => $this->faker->numberBetween(1, 200),
         'prix' =>$this->faker->randomFloat(2, 100, 1000),
+      
         ];
+
     }
 }
