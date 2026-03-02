@@ -71,7 +71,7 @@
 
                 <div class="mb-4">
                     <label class="form-label fw-bold small text-muted">Nombre de voyageurs</label>
-                    <input type="number" name="nombre_places" class="form-control w-25" min="1" max="{{ $vol->places_disponibles }}" required>
+                    <input type="number" name="nombre_places" class="form-control w-25" value="1" min="1" max="{{ $vol->places_disponibles }}" required>
                 </div>
 
                 <div class="section-title">Paiement Sécurisé</div>
@@ -97,6 +97,7 @@
                 <button type="submit" class="btn btn-submit btn-lg">
                     Confirmer ma réservation <i class="fas fa-chevron-right ms-2"></i>
                 </button>
+                
             </form>
         </div>
     </div>

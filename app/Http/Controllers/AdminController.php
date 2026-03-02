@@ -7,6 +7,7 @@ use App\Models\Vol;
 use App\Models\Reservation;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
+use Barryvdh\DomPDF\Facade\Pdf; 
 
 class AdminController extends Controller
 {
@@ -14,11 +15,21 @@ class AdminController extends Controller
         $admin = Auth::user();
         $nbRes = Reservation::count(); 
         $nbVols = Vol::count();   
-        $users = User::paginate(10);
-        $allRoles = Role::all();    
+        $users = User::paginate(20);
+        $allRoles = Role::all();   
+        $isAuthSuperAdmin = auth()->user()->role === 'superadmin'; 
         $nbUsers = $admin->can('voir-utilisateurs') ? User::count() : 0;
-        return view('admin', compact('admin', 'nbRes', 'nbVols', 'nbUsers','users', 'allRoles'));
+        return view('admin', compact('admin', 'nbRes', 'nbVols', 'isAuthSuperAdmin', 'nbUsers','users', 'allRoles'));
    }
+
+    public function imprimerTicket($id)
+    {
+        $reservation = Reservation::with(['vol', 'user'])->findOrFail($id);
+
+        $pdf = Pdf::loadView('ticket', compact('reservation'));
+        return $pdf->stream('ticket.pdf');
+    }
+
 
     public function creerVol(Request $request) {
         if (!auth()->user()->can('creer-vols')) {
@@ -48,14 +59,22 @@ class AdminController extends Controller
         return back()->with('success', 'Vol n°' . $prochainNumero . ' créé avec succès !');
     }
 
-    public function listeVols() 
-    {   
-        if (!auth()->user()->can('voir-vols')) {
-            return back()->with('error', "Vous n'avez pas le privilège de créer un vol.");
-        }
-        $vols = Vol::orderBy('id', 'asc') ->paginate(20);
-         return view('adminvols', compact('vols'));
+   public function listeVols(Request $request) 
+{   
+    if (!auth()->user()->can('voir-vols')) {
+        return back()->with('error', "Vous n'avez pas le privilège de consulter la liste des vols.");
     }
+    $vols = Vol::orderBy('id', 'asc')->paginate(50);
+    if ($request->ajax()) {
+        return response()->json([
+            'vols'          => $vols->items(), 
+            'next_page_url' => $vols->nextPageUrl()
+        ]);
+    }
+    return view('adminvols', compact('vols'));
+}
+
+
 
     public function updateVol(Request $request, $id) {
         if (!auth()->user()->can('modifier-vols')) {
@@ -94,13 +113,24 @@ class AdminController extends Controller
     }
         
 
-    public function listeReservations() {
-        if (!auth()->user()->can('voir-reservations')) {
-            return back()->with('error', "Vous n'avez pas le privilège de créer un vol.");
-        }
-        $reservations = Reservation::with(['user', 'vol'])->orderBy('created_at', 'asc') ->paginate(20);
-        return view('adminreservations', compact('reservations'));
+   public function listeReservations(Request $request) {
+    if (!auth()->user()->can('voir-reservations')) {
+        return back()->with('error', "Vous n'avez pas le privilège.");
     }
+
+     $reservations = Reservation::with(['user', 'vol'])
+                    ->orderBy('created_at', 'asc')
+                    ->paginate(50);
+
+    if ($request->ajax()) {
+        return response()->json([
+            'reservations'  => $reservations->items(), 
+            'next_page_url' => $reservations->nextPageUrl(),
+        ]);
+    }
+
+    return view('adminreservations', compact('reservations'));
+}
 
     public function cancelReservation($id) {
         if (!auth()->user()->can('annuler-reservations')) {
@@ -122,7 +152,8 @@ class AdminController extends Controller
              }
             $users = User::orderBy('created_at', 'asc')->paginate(20);
             $allRoles = \Spatie\Permission\Models\Role::all(); 
-            return view('adminuser', compact('users', 'allRoles'));
+            $isAuthSuperAdmin = auth()->user()->hasRole('superadmin') || auth()->user()->role === 'superadmin';
+            return view('adminuser', compact('users', 'allRoles', 'isAuthSuperAdmin'));
         }
 
     public function updateRole(Request $request, $id) {

@@ -43,6 +43,13 @@
                         <a href="{{ url('/confirmation/' . $res->id) }}" class="btn-view-ticket">
                             <i class="fas fa-search-plus me-1"></i> Détails
                         </a>
+                        <div>                        
+                        <p >souhaitez vous imprimer votre reçu </p>
+                            <a href="{{ route('reservations.print', $res->id) }}" target="_blank" class="btn-view-ticket">
+                                <i class="fas fa-print me-2"></i> Imprimer (PDF)
+                            </a>
+                        </div>
+
                     </div>
                 </div>
                 @endforeach

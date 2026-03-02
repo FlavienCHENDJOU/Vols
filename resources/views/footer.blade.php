@@ -2,7 +2,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-6 text-start">
-                <span class="fw-bold text-dark">AéroApp</span> - Gestion de réservations de vols.
+                <span class="fw-bold text-dark">AéroFlight</span> - Gestion de réservations de vols.
             </div>
             <div class="col-md-6 text-end">
                 &copy; {{ date('Y') }} Experience unique!

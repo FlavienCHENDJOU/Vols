@@ -20,6 +20,7 @@ class VolFactory extends Factory
         'heure_depart' =>$this->faker->time(),
         'places_disponibles' => $this->faker->numberBetween(1, 200),
         'prix' =>$this->faker->randomFloat(2, 100, 1000),
+        'classe' => $this->faker->randomElement(['Economique', 'Business', 'Première']),
       
         ];
 

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class RemoveNameFromUsersTable extends Migration
+class AddClasseToVolsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class RemoveNameFromUsersTable extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('name');
+        Schema::table('vols', function (Blueprint $table) {
+          $table->string('classe')->default('Economique')->after('prix');
         });
     }
 
@@ -25,8 +25,8 @@ class RemoveNameFromUsersTable extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-           $table->string('name')->nullable();
+       Schema::table('vols', function (Blueprint $table) {
+        $table->dropColumn('classe');      
         });
     }
 }

@@ -1,117 +1,237 @@
-
 @extends($layout)
 
 @section('title', 'Vols Disponibles - AeroFlight')
 
 @section('content')
-   
-<link type="text/css" rel="stylesheet" href="{{asset('css/style.css')}}" />
 
+<div class="search-container">
+    <form id="searchForm" onsubmit="return false;" autocomplete="off">
+        <div class="trip-type">
+            <label><input type="radio" name="trip" checked> <span>Aller-retour</span></label>
+            <label><input type="radio" name="trip"> <span>Aller simple</span></label>
+        </div>
 
-    
-<div class="sticky-search shadow-sm">
-    <div class="container">
-        <div class="search-container bg-white p-2 rounded-4 border">
+        <div class="search-bar">
             <div class="input-group">
-                <span class="input-group-text bg-transparent border-0"><i class="fas fa-search text-primary"></i></span>
-                <input type="text" id="searchInput" class="form-control border-0 shadow-none" placeholder="Chercher une ville, un pays..." onkeyup="filterVols()">
+                <input type="text" name="depart" placeholder="De (Ex: Paris)">
+            </div>
+            <div class="input-group">
+                <input type="text" name="destination" placeholder="À (Ex: Douala)">
+            </div>
+            <div class="input-group">
+                <input type="text" onfocus="(this.type='date')" name="date" placeholder="Date de départ">
+            </div>
+            <div class="input-group">
+                <select name="classe">
+                    <option value="">Toutes les classes</option>
+                    <option value="economique">Économique</option>
+                    <option value="business">Business</option>
+                    <option value="premiere">Première</option>
+                </select>
+            </div>
+            <button type="button" class="btn-search-main" id="btnSearch">
+                <i class="fas fa-search"></i> Rechercher les vols
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="container mt-5">
+    <div class="card main-card shadow-sm border-0" style="border-radius: 15px; overflow: hidden;">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-dark text-white"> <tr>
+                            <th class="px-4 py-3"># </th>
+                            <th class="py-3">Classe</th>
+                            <th class="py-3">Itinéraire</th>
+                            <th class="py-3">Date & Heure</th>
+                            <th class="py-3 text-center">Prix</th>
+                            <th class="py-3 text-end px-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="volList">
+                    @foreach($vols as $vol) 
+                    <tr class="vol-item">
+                        <td class="px-4 text-muted fw-bold vol-number">#{{ $loop->iteration }}</td>
+                        <td>
+                            <div class="badge p-2" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;">
+                                {{ strtoupper($vol->classe) }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="fw-bold text-dark" style="font-size: 1.1rem;">
+                                {{ $vol->depart }} <i class="fas fa-arrow-right mx-2 text-primary" style="font-size: 0.8rem;"></i> {{ $vol->destination }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-dark fw-semibold">📅 {{ \Carbon\Carbon::parse($vol->date_depart)->format('d/m/Y') }}</div>
+                            <div class="small text-muted">🕒 {{ $vol->heure_depart }}</div>
+                        </td>
+                        <td class="text-center">
+                            <span class="fw-bold text-dark" style="font-size: 1.2rem;">{{ number_format($vol->prix, 2) }} $</span>
+                        </td>
+                        <td class="text-end px-4">
+                            <a href="{{ route('reservations.create', ['vol_id' => $vol->id]) }}" class="btn-signup">
+                                <i class="fas fa-ticket-alt me-2"></i>Réserver
+                            </a>
+                        </td>                        
+                    </tr>
+                    @endforeach
+                </tbody>
+                </table> 
+
+                <div id="loading-sentinel" style="min-height: 50px;"></div>
+
+                <div id="noResult" class="text-center py-5">
+                    <i class="fas fa-plane-slash fa-4x text-muted mb-3"></i>
+                    <h3 class="text-white">Aucun vol trouvé</h3>
+                </div>             
             </div>
         </div>
     </div>
 </div>
 
-<div class="container mt-4">
-    <ul class="vol-list p-0" id="volList">
-        @foreach ($vols as $vol)
-        <li class="vol-item vol-card" data-search="{{ strtolower($vol->depart) }} {{ strtolower($vol->destination) }}">
-            <div class="info-vol">
-                <div class="route">
-                    <span class="vol-number">#{{ $loop->iteration }}</span>
-                    {{ $vol->depart }} <i class="fas fa-plane"></i> {{ $vol->destination }}
-                </div>
-                
-                <div class="details-time">
-                    <div><i class="far fa-calendar-alt"></i> {{ $vol->date_depart }}</div>
-                    <div><i class="far fa-clock"></i> {{ $vol->heure_depart }}</div>
-                </div>
-
-                <div class="actions d-flex gap-2">
-                    <a href="{{ url('/reserver/' . $vol->id) }}" class="btn btn-reserve">
-                        <i class="fas fa-ticket-alt"></i> Réserver
-                    </a>
-                    <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#modalVol{{ $vol->id }}">
-                        <i class="fas fa-info-circle"></i> Détails
-                    </button>
-                </div>
-            </div>
-          
-            <div class="img-container d-none d-md-block">
-                <img src="{{ asset('img/volimage.jpeg') }}" alt="Aperçu vol">
-            </div>
-
-            <div class="modal fade" id="modalVol{{ $vol->id }}" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-dialog-centered">
-                    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-                        <div class="modal-header border-0 bg-light">
-                            <h5 class="modal-title fw-bold">Vol #{{ $loop->iteration }}</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body p-4">
-                            <div class="row">
-                                <div class="col-md-7">
-                                    <h4 class="fw-bold text-primary">{{ $vol->depart }} ➔ {{ $vol->destination }}</h4>
-                                    <p><strong>Prix:</strong> {{ $vol->prix }} €</p>
-                                    <p><strong>Places:</strong> {{ $vol->places_disponibles }}</p>
-                                    <p><strong>Date:</strong> {{ $vol->date_depart }}</p>
-                                    <p><strong>heure:</strong>  {{ $vol->heure_depart }}</p>
-                                </div>
-                                <div class="col-md-5 text-center">
-                                    <img src="{{ asset('img/volimage.jpeg') }}" class="img-fluid rounded shadow">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </li>
-        @endforeach
-    </ul>
-    
-    <div id="noResult" class="text-center py-5">
-        <i class="fas fa-plane-slash fa-5x mb-4 text-danger"></i>
-        <h2 class="fw-bold text-white">VOLS INEXISTANTS</h2>
-        <p class="text-white">Aucun vol ne correspond à votre recherche pour le moment.</p>
-    </div>
-</div>
-
 <script>
-function filterVols() {
-    let input = document.getElementById('searchInput').value.toLowerCase();
-    let cards = document.getElementsByClassName('vol-card');
-    let noResult = document.getElementById('noResult');
-    let volList = document.getElementById('volList');
-    let hasMatch = false;
+// On initialise nextPageUrl avec la valeur fournie par Laravel au chargement
+let nextPageUrl  = "{{ $vols->nextPageUrl() }}";
+let isLoading    = false;
+let searchTimer  = null;
 
-    for (let i = 0; i < cards.length; i++) {
-        let content = cards[i].getAttribute('data-search');
-        if (content.includes(input)) {
-            cards[i].style.display = ""; 
-            hasMatch = true;
-        } else {
-            cards[i].style.display = "none";
-        }
-    }
+const volList  = document.getElementById('volList');
+const sentinel = document.getElementById('loading-sentinel');
+const noResult = document.getElementById('noResult');
+const form     = document.getElementById('searchForm');
 
-    if (hasMatch) {
-        noResult.style.display = "none";
-        volList.style.display = "block";
-    } else {
-        noResult.style.display = "flex";
-        volList.style.display = "none";
-    }
+// 1. Création du HTML pour une nouvelle ligne (AJAX)
+function createVolRow(vol) {
+    // Formatage de la date simple
+    let dateParts = vol.date_depart.split('-');
+    let dateFormatee = dateParts[2] + '/' + dateParts[1] + '/' + dateParts[0];
+
+    return `
+        <tr class="vol-item">
+            <td class="px-4 text-muted fw-bold vol-number">#</td>
+            <td>
+                <div class="badge p-2" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;">
+                    ${vol.classe.toUpperCase()}
+                </div>
+            </td>
+            <td>
+                <div class="fw-bold text-dark" style="font-size: 1.1rem;">
+                    ${vol.depart} <i class="fas fa-arrow-right mx-2 text-primary" style="font-size: 0.8rem;"></i> ${vol.destination}
+                </div>
+            </td>
+            <td>
+                <div class="text-dark fw-semibold">📅 ${dateFormatee}</div>
+                <div class="small text-muted">🕒 ${vol.heure_depart || ''}</div>
+            </td>
+            <td class="text-center">
+                <span class="fw-bold text-dark" style="font-size: 1.2rem;">${parseFloat(vol.prix).toFixed(2)} $</span>
+            </td>
+            <td class="text-end px-4">
+                <a href="/reservations/create?vol_id=${vol.id}" class="btn-signup">
+                    <i class="fas fa-ticket-alt me-2"></i>Réserver
+                </a>
+            </td>                        
+        </tr>`;
 }
+
+function getFilters() {
+    return {
+        depart:      form.querySelector('[name="depart"]').value.trim(),
+        destination: form.querySelector('[name="destination"]').value.trim(),
+        date:        form.querySelector('[name="date"]').value,
+        classe:      form.querySelector('[name="classe"]').value,
+    };
+}
+
+function resetAndSearch() {
+    volList.innerHTML  = '';
+    noResult.style.display = 'none';
+    isLoading = false;
+    
+    // On construit l'URL de départ pour la recherche filtrée
+    // Utilise l'URL actuelle de la page sans les anciens params
+    const baseUrl = window.location.pathname; 
+    nextPageUrl = buildUrl(baseUrl, getFilters());
+    
+    sentinel.innerHTML = '';
+    loadMore(); 
+}
+
+function buildUrl(baseUrl, filters) {
+    const url = new URL(baseUrl, window.location.origin);
+    Object.entries(filters).forEach(([key, val]) => {
+        if (val) url.searchParams.set(key, val);
+    });
+    return url.toString();
+}
+
+function loadMore() {
+    if (isLoading || !nextPageUrl) return;
+    isLoading = true;
+
+    sentinel.innerHTML = `
+        <div class="d-flex justify-content-center align-items-center py-4 gap-2">
+            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+            <span class="text-muted">Chargement des vols...</span>
+        </div>`;
+
+    fetch(nextPageUrl, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.vols.length > 0) {
+            data.vols.forEach(vol => {
+                volList.insertAdjacentHTML('beforeend', createVolRow(vol));
+            });
+            noResult.style.display = 'none';
+        }
+
+        // Renumérotation des lignes
+        document.querySelectorAll('.vol-number').forEach((el, i) => {
+            el.textContent = '#' + (i + 1);
+        });
+
+        nextPageUrl = data.next_page_url;
+        sentinel.innerHTML = '';
+
+        if (!nextPageUrl && volList.children.length === 0) {
+            noResult.style.display = 'block';
+        }
+    })
+    .catch(err => {
+        console.error('Erreur :', err);
+        sentinel.innerHTML = '<p class="text-danger text-center py-3">Erreur de connexion.</p>';
+    })
+    .finally(() => {
+        isLoading = false;
+    });
+}
+
+// ── ÉCOUTEURS D'ÉVÉNEMENTS ──────────────────────────────────────────────────
+
+// Détection du scroll
+const observer = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting && nextPageUrl && !isLoading) {
+        loadMore();
+    }
+}, { threshold: 0.1 });
+observer.observe(sentinel);
+
+// Détection de la saisie (avec délai de 500ms pour économiser le serveur)
+form.addEventListener('input', () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(resetAndSearch, 500);
+});
+
+// Bouton recherche
+document.getElementById('btnSearch').addEventListener('click', resetAndSearch);
+
 </script>
-
 @endsection
-
-

@@ -1,30 +1,27 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-lg py-3">
+<nav class="navbar navbar-expand-lg navbar-light navbar-custom fixed-top shadow-sm py-3">
     <div class="container">
-        <a class="navbar-brand fw-bold text-uppercase tracking-wider" href="#">
-            <i class="fas fa-plane me-2 text-warning"></i>Compagnie Aérienne
-        </a>
+        <div class="logo" style="margin-right:10%">AéroFlight <i class="fas fa-plane"></i></div>
+        
+        <input type="checkbox" id="menu-cb" class="menu-cb">
+        <label for="menu-cb" class="menu-icon">
+            <span></span><span></span><span></span>
+        </label>
 
-        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="nav-content-wrapper" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                  <li class="nav-item"> <a class="nav-link px-3" href="{{ url('/infoUtilisateur') }}"> profil utilisateur</a> </li>
                 <li class="nav-item">  <a class="nav-link px-3" href="{{ url('/vols_disponible') }}">Vols disponibles</a></li>
                 <li class="nav-item">  <a class="nav-link px-3" href="{{ url('/mes_reservations') }}">Mes réservations</a></li>
             </ul>
              
-        </div>
-            <div class="d-flex align-items-center" style="margin-right: 1%;">
-                <button onclick="window.history.back()"class="btn btn-warning fw-bold px-4 rounded-pill shadow-sm" ><i class="fas fa-sign-in-alt me-2"></i>retour  </a>
-            </div>
-            
-    </button>
-            <div class="d-flex align-items-center">
-                 <a class="btn btn-warning fw-bold px-4 rounded-pill shadow-sm" href="{{ url('/exit') }}"> <i class="fas fa-sign-in-alt me-2"></i>Quitter  </a>
+            <div class="auth-buttons gap-2">
+                <button onclick="window.history.back()" class="btn-custom-blue">
+                    <i class="fas fa-arrow-left me-2"></i>Retour
+                </button>
+                <a class="btn-signup" href="{{ url('/exit') }}"> 
+                    <i class="fas fa-sign-out-alt me-2"></i>Quitter
+                </a>
             </div>
         </div>
     </div>
 </nav>
-
