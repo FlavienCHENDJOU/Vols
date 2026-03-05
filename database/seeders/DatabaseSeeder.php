@@ -3,6 +3,10 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\User;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,28 +17,25 @@ class DatabaseSeeder extends Seeder
      */
    public function run()
     {
-        // 1. On lance d'abord les permissions (Indispensable !)
-        $this->call([
+          $this->call([
             PermissionSeeder::class,
             VolSeeder::class,
             ReservationSeeder::class, 
         ]);
 
-        // 2. On crée le rôle Super Admin s'il n'existe pas
         $superAdminRole = Role::firstOrCreate(['name' => 'super_admin']);
-
-        // 3. On crée ton compte Super Admin par défaut
+        $allPermissions = Permission::all();
+        $superAdminRole->syncPermissions($allPermissions);
         $admin = User::firstOrCreate(
-            ['email' => 'admin@gmail.com'], // Ton email de connexion
+            ['email' => 'toto@gmail.com'], 
             [
                 'nom' => 'Admin',
                 'prenom' => 'Principal',
-                'password' => Hash::make('password'), // Ton mot de passe
+                'password' => Hash::make('toto123'), 
                 'statut' => 'Super Admin'
             ]
         );
-
-        // 4. On lui donne le rôle
         $admin->assignRole($superAdminRole);
     }
 }
+

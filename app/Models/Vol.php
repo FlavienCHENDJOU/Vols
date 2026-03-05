@@ -18,7 +18,9 @@ class Vol extends Model
         'date_depart', 
         'prix', 
         'heure_depart',
-        'places_disponibles'
+        'places_disponibles',
+        'classe'
+        
     ];
 
     public function reservations() {

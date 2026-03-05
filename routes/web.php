@@ -26,6 +26,8 @@ Route::middleware(['web'])->group(function()
 
     Route::get('/', function () {  return view('home'); });
 
+    Route::get('/vols', [VolController::class, 'index2']);
+
     Route::get('/accueil', [ReservationController::class, 'accueil']); 
 
     Route::get('/connexion', [ConnexionController::class, 'loginForm']);
@@ -33,6 +35,12 @@ Route::middleware(['web'])->group(function()
     Route::post('/connexion', [ConnexionController::class, 'login']);
 
     Route::post('/enregistrement', [ConnexionController::class, 'register']);
+  
+    Route::get('/reserver/{vol_id}',[ReservationController::class, 'reserver'])
+    ->middleware('auth')
+    ->name('reservations.create');
+
+    Route::get('/reservations/imprimer/{id}', [AdminController::class, 'imprimerTicket'])->name('reservations.print');
 
  
 });
@@ -47,8 +55,6 @@ Route::middleware(['auth'])->group(function() {
     Route::post('/profil/update-photo', [UserController::class, 'updatePhoto']);
 
     Route::get('/vols_disponible', [ReservationController::class, 'vols_disponible']);
-
-    Route::get('/reserver/{vol_id}',[ReservationController::class, 'reserver']);
 
     Route::get('/mes-reservations', [ReservationController::class, 'mesReservations'])->middleware('auth');
 
@@ -88,17 +94,6 @@ Route::middleware(['auth'])->group(function() {
         Route::get('/admin/utilisateurs/supprimer/{id}', [AdminController::class, 'destroyUser']);
 
     });
-
-
-    // Route::middleware(['auth', 'role:super_admin|admin_vols|admin_users'])->group(function () {
-    //     Route::get('/admin/roles', [RoleController::class, 'index'])->name('roles.index');
-    //     Route::get('/admin/roles/creer', [RoleController::class, 'create'])->name('roles.create');
-    //     Route::post('/admin/roles/enregistrer', [RoleController::class, 'store'])->name('roles.store');
-    //     Route::delete('/admin/roles/supprimer/{id}', [RoleController::class, 'destroy'])->name('roles.destroy');
-    //     Route::get('/admin/roles/edit/{id}', [RoleController::class, 'edit'])->name('roles.edit');
-    //     Route::put('/admin/roles/update/{id}', [RoleController::class, 'update'])->name('roles.update');
-
-    // });
 
 
     // --- GROUPE ADMIN (VOLS) ---
@@ -155,6 +150,10 @@ Route::middleware(['auth'])->group(function() {
         });
     });
 
+    // Routes pour les exports Admin
+    Route::get('/admin/reservations/export-csv', [ReservationController::class, 'exportCSV'])->name('reservations.export.csv');
+    Route::get('/admin/reservations/export-pdf', [ReservationController::class, 'exportPDF'])->name('reservations.export.pdf');
+
     Route::get('/exit', function () {
         Auth::logout(); 
         session()->invalidate();
@@ -163,5 +162,3 @@ Route::middleware(['auth'])->group(function() {
     });
 
  });
-
-

@@ -40,6 +40,7 @@
                     <label>Contact</label>
                     <span>{{ $reservation->email }}</span>
                 </div>
+               
             </div>
         </div>
 
@@ -52,7 +53,7 @@
             <form id="cancelForm" action="{{ url('/reservation/supprimer/' . $reservation->id) }}" method="POST">
                 @csrf
                 @method('DELETE') 
-                <button type="button" class="btn btn-cancel" onclick="confirmCancel()">
+                <button type="button" class="btn-signup" onclick="confirmCancel()">
                     <i class="fas fa-times me-2"></i> Annuler la réservation
                 </button>
             </form>

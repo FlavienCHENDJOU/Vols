@@ -3,68 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page d'Accueil - Réservations</title>
+    <title>AéroFlight - Réservez votre prochain voyage</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link type="text/css" rel="stylesheet" href="{{asset('css/homestyle.css')}}" />
-    
 </head>
 <body>
-    
-    <div class="container">
-        <h1>🚨 ☄️🛫  <br> Compagnie aérienne de réservation <br> ✈️ ☄️🚨</h1>
-        <h4>Vous avez la possibilité d'effectuer des réservations partout dans le monde en un seul clic. <br> Votre confort et votre sécurité sont notre priorité.</h4>
-        <h2>Qui n'a jamais rêvé de faire des réservations sans se déplacer ?</h2>
-        
-        <div class="image-section">
-            <img src="img/satif.jpg" alt="Satisfaction">
+
+    <nav class="top-nav">
+        <div class="logo">AéroFlight <i class="fas fa-plane"></i></div>
+        <div class="nav-links d-none-mobile">
+            <a href="{{ url('connexion') }}">Vols</a>
+            <a href="{{ url('connexion') }}">Hotels</a>
+            <a href="{{ url('connexion') }}">Sites</a>
         </div>
-        
-        <h2>De parcourir tous les continants , meme les coins les plus caches ?</h2>
-        <div class="image-container">
-            <div class="image-section" id="image1">
-                <img src="img/amerique.jpeg" alt="Réservation pour l'Amérique">
-                <div class="moving-text">Réservation pour l'Amérique</div>
-            </div>
+        <div class="nav-auth">
+            <a href="{{ url('connexion') }}" class="btn-login">Connexion</a>
+            <a href="{{ url('accueil') }}" class="btn-signup">S'inscrire</a>
+        </div>
+    </nav>
 
-            <div class="image-section" id="image2">
-                <img src="img/afrique.jpeg" alt="Réservation pour l'Afrique">
-                <div class="moving-text">Réservation pour l'Afrique</div>
-            </div>
+    <header class="hero">
+        <div class="hero-content">
+            <h1 class="main-title">Où allez-vous <span class="highlight">ensuite ?</span></h1>
+            <p class="sub-title">Explorez le monde avec des tarifs imbattables et un service premium.</p>
 
-            <div class="image-section" id="image3">
-                <img src="img/europe.jpg" alt="Réservation pour l'Europe">
-                <div class="moving-text">Réservation pour l'Europe</div>
+            <div class="search-container">
+                <form action="{{ url('/vols') }}" method="GET">
+                    <div class="trip-type">
+                        <label><input type="radio" name="trip" checked> <span>Aller-retour</span></label>
+                        <label><input type="radio" name="trip"> <span>Aller simple</span></label>
+                    </div>
+
+                    <div class="search-bar">
+                        <div class="input-group">
+                            <i class="fas fa-plane-departure"></i>
+                            <input type="text" name="depart" placeholder="De (Ex: Paris)">
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-plane-arrival"></i>
+                            <input type="text" name="destination"  placeholder="À (Ex: Douala)">
+                        </div>
+                        <div class="input-group">
+                            <i class="far fa-calendar"></i>
+                            <input type="text" onfocus="(this.type='date')" name="date" placeholder="Date de départ">
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-user"></i>
+                            <select name="classe" >
+                                <option value="economique">Toutes les classes</option>
+                                <option value="economique">Économique</option>
+                                <option value="business">Business</option>
+                                <option value="premiere">Première</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-search-main">
+                            <i class="fas fa-search"></i> Rechercher les vols
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
+    </header>
 
-        <h2>Plus de stress pour la localisation d'un hotel après réservation</h2>
-        <p>Nous offrons aussi la possibilité de localiser un autel à votre convenance dans cette ville.</p>
-        
-        <div class="image-section">
-            <img src="img/image3.jpeg" alt="Réservation d'hôtel">
-            <div class="moving-text">Réservation d'hôtel</div>
+    <section class="destination-grid" style=" padding: 3% 5% 1% 5%;">
+        <div class="feature-item">
+            <i class="fas fa-shield-alt"></i>
+            <h3>Pas de frais cachés</h3>
+            <p>Ce que vous voyez est ce que vous payez.</p>
         </div>
+        <div class="feature-item">
+            <i class="fas fa-headset"></i>
+            <h3>Support 24/7</h3>
+            <p>Notre équipe est là pour vous aider à chaque étape.</p>
+        </div>
+        <div class="feature-item">
+            <i class="fas fa-calendar-check"></i>
+            <h3>Réservation Flexible</h3>
+            <p>Modifiez vos dates sans stress.</p>
+        </div>
+    </section>
 
-        <h2>Un séjour trop ennuyeux ? Pas grave !</h2>
-        <p>Nous offrons la possibilité de localiser des sites touristiques de votre choix, avec des lieux de détente.</p>
-        <div class="image-container">
-            <div class="image-section">
-                <img src="img/touriste1.jpeg" alt="Site touristique">
-                <div class="moving-text">Site touristique</div>
+    <section class="destinations">
+        <h2 class="section-title">Destinations Populaires</h2>
+        <div class="destination-grid">
+            <div class="dest-card">
+                <img src="img/amerique.jpeg" alt="Amérique">
+                <div class="dest-info">
+                    <h3>Amérique</h3>
+                    <p>À partir de 499€</p>
+                    <a href="{{ url('connexion') }}" class="btn-book">Réserver</a>
+                </div>
             </div>
-            <div class="image-section">
-                <img src="img/touriste2.jpeg" alt="Site touristique">
-                <div class="moving-text">Site touristique</div>
+            <div class="dest-card">
+                <img src="img/afrique.jpeg" alt="Afrique">
+                <div class="dest-info">
+                    <h3>Afrique</h3>
+                    <p>À partir de 320€</p>
+                    <a href="{{ url('connexion') }}" class="btn-book">Réserver</a>
+                </div>
             </div>
-            <div class="image-section">
-                <img src="img/touriste3.jpg" alt="Site touristique">
-                <div class="moving-text">Site touristique</div>
+            <div class="dest-card">
+                <img src="img/europe.jpg" alt="Europe">
+                <div class="dest-info">
+                    <h3>Europe</h3>
+                    <p>À partir de 150€</p>
+                    <a href="{{ url('connexion') }}" class="btn-book">Réserver</a>
+                </div>
             </div>
         </div>
+    </section>
 
-        <a href="{{ url('accueil')}}" class="button">Commencer l'Essai</a>
-        <a href="{{ url('connexion') }}" class="button">Connectez-vous</a></p>
-                                    
-    </div>
+    <footer class="main-footer">
+        <p>&copy; 2026 AéroFlight. </p>
+    </footer>
 
 </body>
 </html>
+
